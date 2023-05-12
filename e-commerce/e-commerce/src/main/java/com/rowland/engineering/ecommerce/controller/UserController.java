@@ -2,8 +2,10 @@ package com.rowland.engineering.ecommerce.controller;
 
 import com.rowland.engineering.ecommerce.dto.ApiResponse;
 import com.rowland.engineering.ecommerce.dto.RegisterRequest;
+import com.rowland.engineering.ecommerce.dto.UserSummary;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
+import com.rowland.engineering.ecommerce.security.CurrentUser;
 import com.rowland.engineering.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,5 +53,12 @@ public class UserController {
     @GetMapping("/all")
     public List<User> getUsers(){
         return userService.getAllUsers();
+    }
+
+
+    @GetMapping("/user/me")    //@PreAuthorize("hasRole('USER')")
+    public UserSummary getCurrentUser(@CurrentUser User currentUser) {
+        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername());
+        return userSummary;
     }
 }

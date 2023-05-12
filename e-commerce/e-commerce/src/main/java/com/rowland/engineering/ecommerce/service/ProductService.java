@@ -43,25 +43,24 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public ApiResponse markProductAsFavourite(FavouriteRequest favouriteRequest,
-                                              User currentUser) {
-        Product product = productRepository.findById(favouriteRequest.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", favouriteRequest.getProductId()));
+    public ApiResponse markProductAsFavourite(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
         System.out.println(product);
 
-        //User user = userRepository.getOne(currentUser.getId()); //actual code but deprecated
-        User user = userRepository.getReferenceById(currentUser.getId());
+//        User user = userRepository.getReferenceById(currentUser.getId());
 
-        System.out.println(user);
+//        System.out.println(user);
         Favourite favourite = new Favourite();
         favourite.setProduct(product);
-        favourite.setUser(user);
+//        favourite.setUser(user);
+
         System.out.println(favourite + "FAVOURITE");
         try {
             favourite = favouriteRepository.save(favourite);
         } catch (DataIntegrityViolationException ex) {
-            logger.info("User {} has already marked product with id {}", currentUser.getId(), favouriteRequest.getProductId());
+            logger.info("{} has already been marked product",  product.getProductName());
             throw new BadRequestException("Sorry! You have already marked this product");
         }
         return new ApiResponse(true, "Favourite Selected");
@@ -73,7 +72,7 @@ public class ProductService {
 
     }
 
-    public List<Favourite> viewMarked(User currentUser) {
+    public List<Favourite> viewMarked() {
         List<Favourite> fav = favouriteRepository.findAll();
         return fav;
     }
@@ -83,17 +82,21 @@ public class ProductService {
         List<Favourite> fav = favouriteRepository.findAll();
         return fav;
     }
-    public List<Favourite> viewMarked2(User currentUser) {
-        List<Long> ids = favouriteRepository.findAllByUserId(currentUser.getId());
-        List<Favourite> fav = favouriteRepository.findAll();
-        return fav;
-    }
-    public List<Favourite> viewMarked4(User currentUser) {
-        List<Product> productId = productRepository.findAll();
-        List<Long> productIds = productId.stream().map(Product::getId).toList();
-        List<Favourite> fav = favouriteRepository.findByUserIdAndPollIdIn(currentUser.getId(),productIds );
-        return fav;
-    }
+//    public List<Favourite> viewMarked2(User currentUser) {
+//        List<Long> ids = favouriteRepository.findAllByUserId(currentUser.getId());
+//        List<Favourite> fav = favouriteRepository.findAll();
+//        return fav;
+//    }
+//    public List<Favourite> viewMarked4(User currentUser) {
+//        List<Product> productId = productRepository.findAll();
+//        List<Long> productIds = productId.stream().map(Product::getId).toList();
+//        List<Favourite> fav = favouriteRepository.findByUserIdAndPollIdIn(currentUser.getId(),productIds );
+//        return fav;
+//    }
 
 
+    public ApiResponse unmark(Long id, User currentUser) {
+        favouriteRepository.deleteById(id);
+        return new ApiResponse(true, "Favourite Unmarked");
+    }
 }

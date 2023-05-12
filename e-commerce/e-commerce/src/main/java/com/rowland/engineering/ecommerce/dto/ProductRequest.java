@@ -9,10 +9,8 @@ import org.hibernate.annotations.NaturalId;
 @AllArgsConstructor
 public class ProductRequest {
 
-    @NaturalId
     private String productName;
 
-    @NotNull
     private Integer price;
 
     private Integer quantity;

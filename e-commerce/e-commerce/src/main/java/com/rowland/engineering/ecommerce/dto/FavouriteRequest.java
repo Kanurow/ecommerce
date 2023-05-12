@@ -10,7 +10,6 @@ import lombok.Data;
 
 @Data
 public class FavouriteRequest {
-    @NotNull
     private Long productId;
 
 }
