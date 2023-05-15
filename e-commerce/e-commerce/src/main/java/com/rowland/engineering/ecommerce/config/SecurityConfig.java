@@ -1,9 +1,13 @@
 package com.rowland.engineering.ecommerce.config;
 
+import com.rowland.engineering.ecommerce.model.Role;
+import com.rowland.engineering.ecommerce.model.RoleName;
+import com.rowland.engineering.ecommerce.repository.RoleRepository;
 import com.rowland.engineering.ecommerce.security.CustomUserDetailsService;
 import com.rowland.engineering.ecommerce.security.JwtAuthenticationEntryPoint;
 import com.rowland.engineering.ecommerce.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,6 +31,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
+
+//    @Bean
+//    public CommandLineRunner insertRoles(RoleRepository roleRepository) {
+//        return args -> {
+//            Role admin = new Role();
+//            admin.setName(RoleName.valueOf("ROLE_ADMIN"));
+//            roleRepository.save(admin);
+//
+//            Role user = new Role();
+//            user.setName(RoleName.valueOf("ROLE_USER"));
+//            roleRepository.save(user);
+//        };
+//    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

@@ -39,8 +39,6 @@ public class User extends DateAudit implements UserDetails {
 
     private String mobile;
 
-
-
     private String email;
 
     private String password;
