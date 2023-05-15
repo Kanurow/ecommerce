@@ -47,7 +47,6 @@ public class ProductController {
     @PostMapping("/mark/{id}")
     public ResponseEntity<ApiResponse> markProductAsFavourite(
             @PathVariable(value = "id") Long id) {
-
         return new ResponseEntity<ApiResponse>(productService.markProductAsFavourite(id),HttpStatus.ACCEPTED);
     }
 
@@ -63,28 +62,19 @@ public class ProductController {
         return productService.viewProduct();
     }
 
-//    @GetMapping("/favourites")
-//    public List<Favourite> viewAllMarked(@CurrentUser User currentUser) {
-//        return productService.viewMarked(currentUser);
-//    }
 
     @GetMapping("/favourites")
     public List<Favourite> viewAllMarked() {
         return productService.viewMarked();
     }
 
-//    @GetMapping("/favourites1")
-//    public List<Favourite> viewAllMarked1(@CurrentUser User currentUser) {
-//        return productService.viewMarked1(currentUser);
-//    }
-//    @GetMapping("/favourites2")
-//    public List<Favourite> viewAllMarked2(@CurrentUser User currentUser) {
-//        return productService.viewMarked2(currentUser);
-//    }
-//    @GetMapping("/favourites3")
-//    public List<Favourite> viewAllMarked3(@CurrentUser User currentUser) {
-//        return productService.viewMarked4(currentUser);
-//    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse> deleteProduct(
+            @PathVariable(value = "id") Long id,
+            @CurrentUser User currentUser) {
+        return new ResponseEntity<ApiResponse>(productService.deleteProduct(id, currentUser),HttpStatus.OK);
+    }
+
 
 
 }

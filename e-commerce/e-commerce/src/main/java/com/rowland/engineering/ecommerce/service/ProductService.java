@@ -82,21 +82,16 @@ public class ProductService {
         List<Favourite> fav = favouriteRepository.findAll();
         return fav;
     }
-//    public List<Favourite> viewMarked2(User currentUser) {
-//        List<Long> ids = favouriteRepository.findAllByUserId(currentUser.getId());
-//        List<Favourite> fav = favouriteRepository.findAll();
-//        return fav;
-//    }
-//    public List<Favourite> viewMarked4(User currentUser) {
-//        List<Product> productId = productRepository.findAll();
-//        List<Long> productIds = productId.stream().map(Product::getId).toList();
-//        List<Favourite> fav = favouriteRepository.findByUserIdAndPollIdIn(currentUser.getId(),productIds );
-//        return fav;
-//    }
+
 
 
     public ApiResponse unmark(Long id, User currentUser) {
         favouriteRepository.deleteById(id);
         return new ApiResponse(true, "Favourite Unmarked");
+    }
+
+    public ApiResponse deleteProduct(Long id, User currentUser) {
+        productRepository.deleteById(id);
+        return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
     }
 }
