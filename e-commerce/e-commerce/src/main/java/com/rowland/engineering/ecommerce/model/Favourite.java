@@ -8,8 +8,8 @@ import lombok.Data;
 @Entity
 @Table(name = "favourite", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
-                "product_id"
-//                "user_id"
+                "product_id",
+                "user_id"
         })
 })
 public class Favourite {
@@ -22,7 +22,7 @@ public class Favourite {
     private Product product;
 
 
-//    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

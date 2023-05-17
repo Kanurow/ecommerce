@@ -41,6 +41,9 @@ public class User extends DateAudit implements UserDetails {
 
     private String email;
 
+    private Double voucherBalance;
+    private Double accountBalance;
+
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;

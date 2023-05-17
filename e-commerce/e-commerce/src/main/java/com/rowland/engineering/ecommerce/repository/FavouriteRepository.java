@@ -28,5 +28,5 @@ public interface FavouriteRepository extends JpaRepository<Favourite, Long> {
 //    List<Long> findAllByUserId(@Param("userId") Long userId);
 //
 //    @Query("SELECT f FROM Favourite f where f.user.id = :userId and f.product.id in :productIds")
-//    List<Favourite> findByUserIdAndPollIdIn(@Param("userId") Long userId, @Param("productIds") List<Long> productIds);
+//    List<Favourite> findByUserIdAndProductIdIn(@Param("userId") Long userId, @Param("productIds") List<Long> productIds);
 }

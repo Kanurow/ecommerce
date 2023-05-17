@@ -1,12 +1,10 @@
 package com.rowland.engineering.ecommerce.controller;
 
 
-import com.rowland.engineering.ecommerce.dto.ApiResponse;
-import com.rowland.engineering.ecommerce.dto.FavouriteRequest;
-import com.rowland.engineering.ecommerce.dto.ProductRequest;
-import com.rowland.engineering.ecommerce.dto.ProductResponse;
+import com.rowland.engineering.ecommerce.dto.*;
 import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.Product;
+import com.rowland.engineering.ecommerce.model.PromoCode;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.security.CurrentUser;
 import com.rowland.engineering.ecommerce.service.ProductService;
@@ -44,10 +42,12 @@ public class ProductController {
     }
 
 
-    @PostMapping("/mark/{id}")
+    @PostMapping("/mark/{productId}/{userId}")
     public ResponseEntity<ApiResponse> markProductAsFavourite(
-            @PathVariable(value = "id") Long id) {
-        return new ResponseEntity<ApiResponse>(productService.markProductAsFavourite(id),HttpStatus.ACCEPTED);
+            @PathVariable(value = "productId") Long productId,
+//            @RequestBody FavouriteRequest favouriteRequest,
+            @PathVariable(value = "userId") Long userId) {
+        return new ResponseEntity<ApiResponse>(productService.markProductAsFavourite(productId,userId),HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/unmark/{id}")
@@ -75,6 +75,23 @@ public class ProductController {
         return new ResponseEntity<ApiResponse>(productService.deleteProduct(id, currentUser),HttpStatus.OK);
     }
 
+
+    @PostMapping("/addPromoCode")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> createPromo(@Valid @RequestBody PromoCodeRequest promoCodeRequest) {
+        PromoCode promo = productService.createPromo(promoCodeRequest);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{promoId}")
+                .buildAndExpand(promo.getId()).toUri();
+        return ResponseEntity.created(location)
+                .body(new ApiResponse(true, "Promo Created Successfully"));
+    }
+
+    @GetMapping("/getPromoCodes")   // @RolesAllowed()    //  @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<PromoCode> getAllPromo() {
+        return productService.getAllPromo();
+    }
 
 
 }

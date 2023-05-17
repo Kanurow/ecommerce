@@ -1,6 +1,7 @@
 package com.rowland.engineering.ecommerce.controller;
 
 import com.rowland.engineering.ecommerce.exception.AppException;
+import com.rowland.engineering.ecommerce.model.PromoCode;
 import com.rowland.engineering.ecommerce.model.Role;
 import com.rowland.engineering.ecommerce.model.RoleName;
 import com.rowland.engineering.ecommerce.model.User;
@@ -8,6 +9,7 @@ import com.rowland.engineering.ecommerce.dto.ApiResponse;
 import com.rowland.engineering.ecommerce.dto.JwtAuthenticationResponse;
 import com.rowland.engineering.ecommerce.dto.LoginRequest;
 import com.rowland.engineering.ecommerce.dto.RegisterRequest;
+import com.rowland.engineering.ecommerce.repository.PromoCodeRepository;
 import com.rowland.engineering.ecommerce.repository.RoleRepository;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import com.rowland.engineering.ecommerce.security.JwtTokenProvider;
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 
 @CrossOrigin("http://localhost:3000")
 @RestController
@@ -39,7 +42,7 @@ public class AuthController {
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
-
+    private final PromoCodeRepository promoCodeRepository;
     private final JwtTokenProvider tokenProvider;
 
     @PostMapping("/signin")
@@ -73,11 +76,16 @@ public class AuthController {
                     HttpStatus.BAD_REQUEST);
         }
 
+
         // Creating user's account
         User user = new User(registerRequest.getName(),  registerRequest.getUsername(),
                 registerRequest.getEmail(), registerRequest.getPassword(), registerRequest.getMobile());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(promoCodeRepository.existsByCodeIgnoreCase(registerRequest.getPromoCode())) {
+            PromoCode code = promoCodeRepository.findByCodeIgnoreCase(registerRequest.getPromoCode());
+            user.setVoucherBalance(code.getPromoAmount());
+        }
 
         Role userRole;
 
@@ -92,12 +100,12 @@ public class AuthController {
 
         user.setRoles(Collections.singleton(userRole));
 
-        User result = userRepository.save(user);
+        User savedUser = userRepository.save(user);
         System.out.println(user);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/users/{username}")
-                .buildAndExpand(result.getUsername()).toUri();
+                .buildAndExpand(savedUser.getUsername()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }

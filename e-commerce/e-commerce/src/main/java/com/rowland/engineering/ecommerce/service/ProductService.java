@@ -1,16 +1,15 @@
 package com.rowland.engineering.ecommerce.service;
 
-import com.rowland.engineering.ecommerce.dto.ApiResponse;
-import com.rowland.engineering.ecommerce.dto.FavouriteRequest;
-import com.rowland.engineering.ecommerce.dto.ProductRequest;
-import com.rowland.engineering.ecommerce.dto.ProductResponse;
+import com.rowland.engineering.ecommerce.dto.*;
 import com.rowland.engineering.ecommerce.exception.BadRequestException;
 import com.rowland.engineering.ecommerce.exception.ResourceNotFoundException;
 import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.Product;
+import com.rowland.engineering.ecommerce.model.PromoCode;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.repository.FavouriteRepository;
 import com.rowland.engineering.ecommerce.repository.ProductRepository;
+import com.rowland.engineering.ecommerce.repository.PromoCodeRepository;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final FavouriteRepository favouriteRepository;
+    private final PromoCodeRepository promoCodeRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
 
@@ -43,18 +43,19 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public ApiResponse markProductAsFavourite(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
+
+    public ApiResponse markProductAsFavourite(Long productId, Long userId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
         System.out.println(product);
 
-//        User user = userRepository.getReferenceById(currentUser.getId());
+        User user = userRepository.getReferenceById(userId);
 
-//        System.out.println(user);
+        System.out.println(user);
         Favourite favourite = new Favourite();
         favourite.setProduct(product);
-//        favourite.setUser(user);
+        favourite.setUser(user);
 
         System.out.println(favourite + "FAVOURITE");
         try {
@@ -76,22 +77,25 @@ public class ProductService {
         List<Favourite> fav = favouriteRepository.findAll();
         return fav;
     }
-    public List<Favourite> viewMarked1(User currentUser) {
-//        List<Long> ids = favouriteRepository.findAllFavouriteByUserId(currentUser.getId());
-//        List<Favourite> fav = favouriteRepository.findAllById(ids);
-        List<Favourite> fav = favouriteRepository.findAll();
-        return fav;
+
+    public ApiResponse deleteProduct(Long id, User currentUser) {
+        productRepository.deleteById(id);
+        return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
     }
-
-
 
     public ApiResponse unmark(Long id, User currentUser) {
         favouriteRepository.deleteById(id);
         return new ApiResponse(true, "Favourite Unmarked");
     }
 
-    public ApiResponse deleteProduct(Long id, User currentUser) {
-        productRepository.deleteById(id);
-        return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
+    public PromoCode createPromo(PromoCodeRequest promoCodeRequest) {
+        PromoCode promo = new PromoCode();
+        promo.setCode(promoCodeRequest.getCode());
+        promo.setPromoAmount(promoCodeRequest.getPromoAmount());
+        return promoCodeRepository.save(promo);
+    }
+
+    public List<PromoCode> getAllPromo() {
+        return promoCodeRepository.findAll();
     }
 }

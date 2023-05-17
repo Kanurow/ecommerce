@@ -11,5 +11,4 @@ import lombok.Data;
 @Data
 public class FavouriteRequest {
     private Long productId;
-
 }

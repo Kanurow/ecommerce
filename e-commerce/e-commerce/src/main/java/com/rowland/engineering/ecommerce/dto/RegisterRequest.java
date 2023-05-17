@@ -12,7 +12,7 @@ public class RegisterRequest {
     private String username;
 
     private String mobile;
-
+    private String promoCode;
     private String email;
 
     private String password;
