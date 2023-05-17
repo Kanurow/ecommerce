@@ -98,4 +98,8 @@ public class ProductService {
     public List<PromoCode> getAllPromo() {
         return promoCodeRepository.findAll();
     }
+
+    public List<Favourite> getUserFavourites(Long userId) {
+        return favouriteRepository.findAllFavouriteByUserId(userId);
+    }
 }

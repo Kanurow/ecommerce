@@ -10,14 +10,19 @@ import java.util.List;
 
 @Repository
 public interface FavouriteRepository extends JpaRepository<Favourite, Long> {
-//
-//
-//    //List<Favourite> findAllMarked();
+
 //    @Query(
 //            nativeQuery = true,
 //            value = "SELECT * FROM ecommerce.favourite WHERE user_id = :userId"
 //    )
-//    List<Long> findAllFavouriteByUserId(@Param("userId") Long userId);
+//    List<Favourite> findAllFavouriteByUserId(@Param("userId") Long userId);
+
+//    @Query(nativeQuery = true, value = "SELECT f FROM Favourite f WHERE f.user_Id = :userId")
+    List<Favourite> findAllFavouriteByUserId(Long userId);
+
+
+
+
 //
 //    @Query("SELECT f.product.id FROM Favourite f WHERE f.user.id = :userId")
 //    List<Long> findAllProductIdsByUserId(@Param("userId") Long userId);

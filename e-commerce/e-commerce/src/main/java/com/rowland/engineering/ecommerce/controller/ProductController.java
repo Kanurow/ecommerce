@@ -68,6 +68,13 @@ public class ProductController {
         return productService.viewMarked();
     }
 
+    @GetMapping("/favourites/{userId}")
+    public List<Favourite> getUserMarkedFavourites(
+            @PathVariable(value = "userId") Long userId
+    ) {
+        return productService.getUserFavourites(userId);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteProduct(
             @PathVariable(value = "id") Long id,

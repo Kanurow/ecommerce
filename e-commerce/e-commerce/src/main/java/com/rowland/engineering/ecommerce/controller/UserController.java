@@ -32,10 +32,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")  //@RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<?> deleteUser(@PathVariable(value = "id") Long id){
         Optional<User> userId = userRepository.findById(id);
-        System.out.println(userId + " USER ID");
-
         userRepository.deleteById(id);
-
         return new ResponseEntity<>(new ApiResponse(true, "User has been deleted"), HttpStatus.ACCEPTED);
     }
 
