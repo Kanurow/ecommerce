@@ -20,7 +20,7 @@ public interface FavouriteRepository extends JpaRepository<Favourite, Long> {
 //    @Query(nativeQuery = true, value = "SELECT f FROM Favourite f WHERE f.user_Id = :userId")
     List<Favourite> findAllFavouriteByUserId(Long userId);
 
-
+    List<Favourite> findAllByProductId(Long id);
 
 
 //

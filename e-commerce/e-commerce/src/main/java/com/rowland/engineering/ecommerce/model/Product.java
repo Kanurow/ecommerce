@@ -1,5 +1,6 @@
 package com.rowland.engineering.ecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -31,5 +32,8 @@ public class Product {
     private Integer price;
 
     private Integer quantity;
+//    @JsonIgnore
+//    @OneToMany(orphanRemoval = true)
+//    private Favourite favourite;
 
 }

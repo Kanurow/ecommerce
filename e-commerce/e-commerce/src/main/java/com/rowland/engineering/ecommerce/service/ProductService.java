@@ -79,6 +79,9 @@ public class ProductService {
     }
 
     public ApiResponse deleteProduct(Long id, User currentUser) {
+        List<Favourite> productIds = favouriteRepository.findAllByProductId(id);
+        favouriteRepository.deleteAll(productIds);
+        System.out.println(productIds + "Product ids");
         productRepository.deleteById(id);
         return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
     }
