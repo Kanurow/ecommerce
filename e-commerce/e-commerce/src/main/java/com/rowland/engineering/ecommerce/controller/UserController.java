@@ -3,6 +3,7 @@ package com.rowland.engineering.ecommerce.controller;
 import com.rowland.engineering.ecommerce.dto.ApiResponse;
 import com.rowland.engineering.ecommerce.dto.RegisterRequest;
 import com.rowland.engineering.ecommerce.dto.UserSummary;
+import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import com.rowland.engineering.ecommerce.security.CurrentUser;
@@ -31,8 +32,7 @@ public class UserController {
     @DeleteMapping("users/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")  //@RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<?> deleteUser(@PathVariable(value = "id") Long id){
-        Optional<User> userId = userRepository.findById(id);
-        userRepository.deleteById(id);
+        userService.deleteUserById(id);
         return new ResponseEntity<>(new ApiResponse(true, "User has been deleted"), HttpStatus.ACCEPTED);
     }
 
