@@ -1,6 +1,7 @@
 package com.rowland.engineering.ecommerce.service;
 
 import com.rowland.engineering.ecommerce.dto.RegisterRequest;
+import com.rowland.engineering.ecommerce.dto.UpdateUserRequest;
 import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.Product;
 import com.rowland.engineering.ecommerce.model.User;
@@ -30,9 +31,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Optional<User> updateUserById(RegisterRequest update, Long id) {
-        System.out.println("update update");
-        return userRepository.findById(id).map(
+    public Optional<User> updateUserById(UpdateUserRequest update, Long userId) {
+        return userRepository.findById(userId).map(
                 user -> {
                     user.setUsername(update.getUsername());
                     user.setName(update.getName());

@@ -2,6 +2,7 @@ package com.rowland.engineering.ecommerce.controller;
 
 import com.rowland.engineering.ecommerce.dto.ApiResponse;
 import com.rowland.engineering.ecommerce.dto.RegisterRequest;
+import com.rowland.engineering.ecommerce.dto.UpdateUserRequest;
 import com.rowland.engineering.ecommerce.dto.UserSummary;
 import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.User;
@@ -42,9 +43,9 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public Optional<User> updateUserById(@RequestBody RegisterRequest update,
-                                         @PathVariable(value = "id") Long id) {
-        return userService.updateUserById(update, id);
+    public Optional<User> updateUserById(@RequestBody UpdateUserRequest update,
+                                         @PathVariable(value = "id") Long userId) {
+        return userService.updateUserById(update, userId);
     }
 
     @GetMapping("/all")
