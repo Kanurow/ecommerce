@@ -32,18 +32,6 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
-//    @Bean
-//    public CommandLineRunner insertRoles(RoleRepository roleRepository) {
-//        return args -> {
-//            Role admin = new Role();
-//            admin.setName(RoleName.valueOf("ROLE_ADMIN"));
-//            roleRepository.save(admin);
-//
-//            Role user = new Role();
-//            user.setName(RoleName.valueOf("ROLE_USER"));
-//            roleRepository.save(user);
-//        };
-//    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -83,7 +71,13 @@ public class SecurityConfig {
                 .authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**", "/api/products/**")
+                .requestMatchers("/api/auth/**",
+                    "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "swagger-ui.html"
+//                        "/api/products/**"
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()

@@ -13,6 +13,8 @@ import com.rowland.engineering.ecommerce.repository.PromoCodeRepository;
 import com.rowland.engineering.ecommerce.repository.RoleRepository;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import com.rowland.engineering.ecommerce.security.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication - Registration /Sign In")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -45,6 +48,10 @@ public class AuthController {
     private final PromoCodeRepository promoCodeRepository;
     private final JwtTokenProvider tokenProvider;
 
+    @Operation(
+            description = "Post request for signing in registered user",
+            summary = "Enables registered user sign in with either username or email and returns bearer token"
+    )
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         System.out.println(loginRequest +" LOGIN REQUEST");
@@ -63,6 +70,10 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    @Operation(
+            description = "Post request for adding user to database",
+            summary = "Enables user registration - To sign up with admin role, add `row` to email field."
+    )
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody  RegisterRequest registerRequest) {
         System.out.println(registerRequest);
