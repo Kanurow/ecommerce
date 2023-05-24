@@ -2,10 +2,7 @@ package com.rowland.engineering.ecommerce.controller;
 
 
 import com.rowland.engineering.ecommerce.dto.*;
-import com.rowland.engineering.ecommerce.model.Favourite;
-import com.rowland.engineering.ecommerce.model.Product;
-import com.rowland.engineering.ecommerce.model.PromoCode;
-import com.rowland.engineering.ecommerce.model.User;
+import com.rowland.engineering.ecommerce.model.*;
 import com.rowland.engineering.ecommerce.security.CurrentUser;
 import com.rowland.engineering.ecommerce.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,21 +56,41 @@ public class ProductController {
     @PostMapping("/mark/{productId}/{userId}")
     public ResponseEntity<ApiResponse> markProductAsFavourite(
             @PathVariable(value = "productId") Long productId,
-//            @RequestBody FavouriteRequest favouriteRequest,
             @PathVariable(value = "userId") Long userId) {
         return new ResponseEntity<ApiResponse>(productService.markProductAsFavourite(productId,userId),HttpStatus.ACCEPTED);
     }
 
     @Operation(
-            description = "Delete request for deselecting a product",
+            description = "Post request for selecting a product",
             summary = "Enables selecting a product as favourite"
     )
+    @PostMapping("/addtocart/{productId}/{userId}")
+    public ResponseEntity<ApiResponse> addToCart(
+            @PathVariable(value = "productId") Long productId,
+            @PathVariable(value = "userId") Long userId) {
+        return new ResponseEntity<ApiResponse>(productService.addToCart(productId,userId),HttpStatus.ACCEPTED);
+    }
+    @Operation(
+            description = "Delete request for deselecting a product by passing favourite id",
+            summary = "Enables deselecting a product as favourite"
+    )
+    @DeleteMapping("/removefromcart/{id}")
+    public ResponseEntity<ApiResponse> removeFromCart(
+            @PathVariable(value = "id") Long id,
+            @CurrentUser User currentUser) {
+        return new ResponseEntity<ApiResponse>(productService.removeFromCart(id, currentUser),HttpStatus.ACCEPTED);
+    }
     @DeleteMapping("/unmark/{id}")
     public ResponseEntity<ApiResponse> unmarkProductAsFavourite(
             @PathVariable(value = "id") Long id,
             @CurrentUser User currentUser) {
-        return new ResponseEntity<ApiResponse>(productService.unmark(id, currentUser),HttpStatus.ACCEPTED);
+        try {
+            return new ResponseEntity<>(productService.unmark(id, currentUser), HttpStatus.ACCEPTED);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(false, "Error occurred while unmarking the favourite: " + ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @Operation(
             description = "Get request for viewing all products",
@@ -90,9 +107,12 @@ public class ProductController {
             summary = "Returns list of all selected products by all users"
     )
     @GetMapping("/favourites")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<Favourite> viewAllMarked() {
         return productService.viewMarked();
     }
+
+
 
     @Operation(
             description = "Get request for all selected products by user",
@@ -104,6 +124,20 @@ public class ProductController {
     ) {
         return productService.getUserFavourites(userId);
     }
+
+
+    @Operation(
+            description = "Get request fo products in user shopping cart",
+            summary = "Returns list of user cart items"
+    )
+    @GetMapping("/cart/{userId}")
+    public List<ShoppingCart> getUserCart(
+            @PathVariable(value = "userId") Long userId
+    ) {
+        return productService.getUserCart(userId);
+    }
+
+
 
     @Operation(
             description = "Delete selected product",

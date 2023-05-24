@@ -1,0 +1,16 @@
+package com.rowland.engineering.ecommerce.repository;
+
+import com.rowland.engineering.ecommerce.model.Product;
+import com.rowland.engineering.ecommerce.model.ShoppingCart;
+import com.rowland.engineering.ecommerce.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, Long> {
+    List<ShoppingCart> findAllByUserId(Long userId);
+
+    ShoppingCart findByProductAndUser(Product product, User user);
+}

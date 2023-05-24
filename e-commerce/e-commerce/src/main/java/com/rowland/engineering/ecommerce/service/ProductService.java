@@ -3,14 +3,8 @@ package com.rowland.engineering.ecommerce.service;
 import com.rowland.engineering.ecommerce.dto.*;
 import com.rowland.engineering.ecommerce.exception.BadRequestException;
 import com.rowland.engineering.ecommerce.exception.ResourceNotFoundException;
-import com.rowland.engineering.ecommerce.model.Favourite;
-import com.rowland.engineering.ecommerce.model.Product;
-import com.rowland.engineering.ecommerce.model.PromoCode;
-import com.rowland.engineering.ecommerce.model.User;
-import com.rowland.engineering.ecommerce.repository.FavouriteRepository;
-import com.rowland.engineering.ecommerce.repository.ProductRepository;
-import com.rowland.engineering.ecommerce.repository.PromoCodeRepository;
-import com.rowland.engineering.ecommerce.repository.UserRepository;
+import com.rowland.engineering.ecommerce.model.*;
+import com.rowland.engineering.ecommerce.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +26,7 @@ public class ProductService {
     private final UserRepository userRepository;
     private final FavouriteRepository favouriteRepository;
     private final PromoCodeRepository promoCodeRepository;
+    private final ShoppingCartRepository cartRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
 
@@ -48,16 +43,18 @@ public class ProductService {
     public ApiResponse markProductAsFavourite(Long productId, Long userId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
-        System.out.println(product);
 
         User user = userRepository.getReferenceById(userId);
+        Favourite existingFavourite = favouriteRepository.findByProductAndUser(product, user);
+        if (existingFavourite != null) {
+            logger.info("{} has already been marked", product.getProductName());
+            throw new BadRequestException("Sorry! You have already marked this product");
+        }
 
-        System.out.println(user);
         Favourite favourite = new Favourite();
         favourite.setProduct(product);
         favourite.setUser(user);
 
-        System.out.println(favourite + "FAVOURITE");
         try {
             favourite = favouriteRepository.save(favourite);
         } catch (DataIntegrityViolationException ex) {
@@ -65,6 +62,24 @@ public class ProductService {
             throw new BadRequestException("Sorry! You have already marked this product");
         }
         return new ApiResponse(true, "Favourite Selected");
+    }
+
+
+    public ApiResponse addToCart(Long productId, Long userId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
+        User user = userRepository.getReferenceById(userId);
+        ShoppingCart existingCartEntry = cartRepository.findByProductAndUser(product, user);
+        if (existingCartEntry != null) {
+            logger.info("{} has already been added to your shopping list", product.getProductName());
+            throw new BadRequestException("Sorry! You have already added this product");
+        }
+        ShoppingCart cart = new ShoppingCart();
+        cart.setProduct(product);
+        cart.setUser(user);
+
+        cartRepository.save(cart);
+        return new ApiResponse(true, "Product Added to cart");
     }
 
 
@@ -86,10 +101,15 @@ public class ProductService {
         return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
     }
 
-    public ApiResponse unmark(Long id, User currentUser) {
+public ApiResponse unmark(Long id, User currentUser) throws Exception {
+    try {
         favouriteRepository.deleteById(id);
-        return new ApiResponse(true, "Favourite Unmarked");
+        return new ApiResponse(true, "Favourite Unmarked by user with id " + currentUser.getName());
+    } catch (Exception ex) {
+        throw new Exception("Error occurred while unmarking the favourite: " + ex.getMessage(), ex);
     }
+}
+
 
     public PromoCode createPromo(PromoCodeRequest promoCodeRequest) {
         PromoCode promo = new PromoCode();
@@ -104,5 +124,14 @@ public class ProductService {
 
     public List<Favourite> getUserFavourites(Long userId) {
         return favouriteRepository.findAllFavouriteByUserId(userId);
+    }
+
+    public List<ShoppingCart> getUserCart(Long userId) {
+        return cartRepository.findAllByUserId(userId);
+    }
+
+    public ApiResponse removeFromCart(Long id, User currentUser) {
+        cartRepository.deleteById(id);
+        return new ApiResponse(true, "Item removed from cart");
     }
 }

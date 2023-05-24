@@ -5,6 +5,7 @@ import com.rowland.engineering.ecommerce.dto.RegisterRequest;
 import com.rowland.engineering.ecommerce.dto.UpdateUserRequest;
 import com.rowland.engineering.ecommerce.dto.UserSummary;
 import com.rowland.engineering.ecommerce.model.Favourite;
+import com.rowland.engineering.ecommerce.model.RoleName;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import com.rowland.engineering.ecommerce.security.CurrentUser;

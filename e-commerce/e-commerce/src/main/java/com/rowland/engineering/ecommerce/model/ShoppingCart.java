@@ -1,19 +1,26 @@
 package com.rowland.engineering.ecommerce.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 
-
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
-@Table(name = "favourite", uniqueConstraints = {
+@Data
+@Table(name = "cart_table", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
                 "product_id",
                 "user_id"
         })
 })
-public class Favourite {
+public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +29,7 @@ public class Favourite {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-
+//    private List<Product> products = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", nullable = false)

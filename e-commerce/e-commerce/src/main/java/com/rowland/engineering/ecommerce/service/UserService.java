@@ -38,6 +38,9 @@ public class UserService {
                     user.setName(update.getName());
                     user.setEmail(update.getEmail());
                     user.setMobile(update.getMobile());
+                    user.setVoucherBalance(user.getVoucherBalance());
+                    user.setAccountBalance(user.getAccountBalance());
+                    user.setPassword(user.getPassword());
                     return userRepository.save(user);
                 }
         );
