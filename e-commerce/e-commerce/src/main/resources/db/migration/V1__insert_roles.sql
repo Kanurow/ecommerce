@@ -12,12 +12,6 @@ CREATE TABLE user_roles (
 
 
 
-
-
-
-
-
-
 CREATE TABLE favourite (
     id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT,
@@ -44,7 +38,7 @@ CREATE TABLE users_table (
     `password` VARCHAR(10000) NOT NULL ,
     mobile VARCHAR(100) ,
     authorities VARCHAR(50),
-    account_balance INT,
+    account_balance INT NOT NULL,
     voucher_balance INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
@@ -67,3 +61,31 @@ CREATE TABLE promo_table (
 
 INSERT INTO roles(name) VALUES('ROLE_USER');
 INSERT INTO roles(name) VALUES('ROLE_ADMIN');
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE cart_checkout (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_address VARCHAR(255) NOT NULL,
+  price DOUBLE NOT NULL,
+  quantity INT NOT NULL,
+  user_id INT NOT NULL
+);
+
+CREATE TABLE cart_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_name VARCHAR(255) NOT NULL,
+  price DOUBLE NOT NULL,
+  quantity INT NOT NULL,
+  subtotal DOUBLE NOT NULL,
+  cart_checkout_id BIGINT,
+  FOREIGN KEY (cart_checkout_id) REFERENCES cart_checkout(id)
+);

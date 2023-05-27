@@ -68,10 +68,13 @@ public class User extends DateAudit implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 user.getMobile(),
+                user.getVoucherBalance(),
+                user.getRoles(),
                 authorities
         );
     }
-    public User(Long id, String name, String username, String email, String password, String mobile, Collection<? extends GrantedAuthority> authorities) {
+
+    public User(Long id, String name, String username, String email, String password, String mobile, Double voucherBalance , Set<Role> roles,Collection<? extends GrantedAuthority> authorities ) {
             this.id = id;
         this.username = username;
         this.name = name;
@@ -79,6 +82,8 @@ public class User extends DateAudit implements UserDetails {
         this.password = password;
         this.mobile = mobile;
         this.authorities = authorities;
+        this.voucherBalance = voucherBalance;
+        this.roles = roles;
     }
 
     public User(String name, String username, String email, String password, String mobile) {

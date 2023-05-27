@@ -12,4 +12,5 @@ import java.util.Set;
 public class UserSummary {
     private Long id;
     private String username;
+    private String email;
 }

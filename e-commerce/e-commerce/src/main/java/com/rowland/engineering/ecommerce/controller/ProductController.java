@@ -43,7 +43,6 @@ public class ProductController {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{productId}")
                 .buildAndExpand(product.getId()).toUri();
-
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "Product Created Successfully"));
     }
@@ -61,7 +60,7 @@ public class ProductController {
     }
 
     @Operation(
-            description = "Post request for selecting a product",
+            description = "Post request for marking a product as favourite",
             summary = "Enables selecting a product as favourite"
     )
     @PostMapping("/addtocart/{productId}/{userId}")
@@ -70,15 +69,15 @@ public class ProductController {
             @PathVariable(value = "userId") Long userId) {
         return new ResponseEntity<ApiResponse>(productService.addToCart(productId,userId),HttpStatus.ACCEPTED);
     }
+
     @Operation(
-            description = "Delete request for deselecting a product by passing favourite id",
-            summary = "Enables deselecting a product as favourite"
+            description = "Delete request for removing a product from cart",
+            summary = "Enables removing a product from cart"
     )
     @DeleteMapping("/removefromcart/{id}")
     public ResponseEntity<ApiResponse> removeFromCart(
-            @PathVariable(value = "id") Long id,
-            @CurrentUser User currentUser) {
-        return new ResponseEntity<ApiResponse>(productService.removeFromCart(id, currentUser),HttpStatus.ACCEPTED);
+            @PathVariable(value = "id") Long id) {
+        return new ResponseEntity<ApiResponse>(productService.removeFromCart(id),HttpStatus.ACCEPTED);
     }
     @DeleteMapping("/unmark/{id}")
     public ResponseEntity<ApiResponse> unmarkProductAsFavourite(
@@ -127,7 +126,7 @@ public class ProductController {
 
 
     @Operation(
-            description = "Get request fo products in user shopping cart",
+            description = "Get request for retrieving products in user shopping cart",
             summary = "Returns list of user cart items"
     )
     @GetMapping("/cart/{userId}")
@@ -144,6 +143,7 @@ public class ProductController {
             summary = "Deletes created product"
     )
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> deleteProduct(
             @PathVariable(value = "id") Long id,
             @CurrentUser User currentUser) {
@@ -176,5 +176,30 @@ public class ProductController {
         return productService.getAllPromo();
     }
 
+
+
+
+    @Operation(
+            description = "Post request for checking out selected products",
+            summary = "Checking out shopping cart"
+    )
+    @PostMapping("/checkout/{userId}")
+    public ResponseEntity<ApiResponse> checkoutCart(
+            @RequestBody CartCheckoutRequest checkoutRequest,
+            @PathVariable(value = "userId") Long userId) {
+        return new ResponseEntity<ApiResponse>(productService.checkoutCart(checkoutRequest,userId),HttpStatus.ACCEPTED);
+    }
+
+
+
+
+    @Operation(
+            description = "Returns list of all checked out product",
+            summary = "Retrieves all checked out goods"
+    )
+    @GetMapping("/checkedout/{id}")
+    public List<CartCheckout> getUserCartByUserId(@PathVariable(value = "id") Long id) {
+        return productService.getCheckedOutCart(id);
+    }
 
 }

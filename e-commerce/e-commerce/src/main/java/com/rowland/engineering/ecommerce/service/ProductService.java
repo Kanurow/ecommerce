@@ -11,10 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
 import java.util.stream.Collectors;
 
 
@@ -26,7 +24,8 @@ public class ProductService {
     private final UserRepository userRepository;
     private final FavouriteRepository favouriteRepository;
     private final PromoCodeRepository promoCodeRepository;
-    private final ShoppingCartRepository cartRepository;
+    private final ShoppingCartRepository shoppingCartRepository;
+    private final CartCheckoutRepository cartCheckoutRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
 
@@ -69,7 +68,7 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
         User user = userRepository.getReferenceById(userId);
-        ShoppingCart existingCartEntry = cartRepository.findByProductAndUser(product, user);
+        ShoppingCart existingCartEntry = shoppingCartRepository.findByProductAndUser(product, user);
         if (existingCartEntry != null) {
             logger.info("{} has already been added to your shopping list", product.getProductName());
             throw new BadRequestException("Sorry! You have already added this product");
@@ -78,7 +77,7 @@ public class ProductService {
         cart.setProduct(product);
         cart.setUser(user);
 
-        cartRepository.save(cart);
+        shoppingCartRepository.save(cart);
         return new ApiResponse(true, "Product Added to cart");
     }
 
@@ -93,13 +92,28 @@ public class ProductService {
         return fav;
     }
 
+//    public ApiResponse deleteProduct(Long id, User currentUser) {
+//        List<Favourite> productIds = favouriteRepository.findAllByProductId(id);
+//        favouriteRepository.deleteAll(productIds);
+//        shoppingCartRepository.deleteByProductId(id);
+//        productRepository.deleteById(id);
+//        return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
+//    }
+
     public ApiResponse deleteProduct(Long id, User currentUser) {
         List<Favourite> productIds = favouriteRepository.findAllByProductId(id);
         favouriteRepository.deleteAll(productIds);
-        System.out.println(productIds + "Product ids");
+
+        // Delete the product from the shopping cart for the current user
+        ShoppingCart shoppingCart = shoppingCartRepository.findByProductIdAndUserId(id, currentUser.getId());
+        if (shoppingCart != null) {
+            shoppingCartRepository.delete(shoppingCart);
+        }
+
         productRepository.deleteById(id);
-        return new ApiResponse(true, "Product with id "+id+ " Deleted by user with id "+ currentUser.getId());
+        return new ApiResponse(true, "Product with id " + id + " deleted by user with id " + currentUser.getId());
     }
+
 
 public ApiResponse unmark(Long id, User currentUser) throws Exception {
     try {
@@ -127,11 +141,73 @@ public ApiResponse unmark(Long id, User currentUser) throws Exception {
     }
 
     public List<ShoppingCart> getUserCart(Long userId) {
-        return cartRepository.findAllByUserId(userId);
+        return shoppingCartRepository.findAllByUserId(userId);
     }
 
-    public ApiResponse removeFromCart(Long id, User currentUser) {
-        cartRepository.deleteById(id);
+    public ApiResponse removeFromCart(Long id) {
+        shoppingCartRepository.deleteById(id);
         return new ApiResponse(true, "Item removed from cart");
+    }
+
+//
+//    public ApiResponse checkoutCart(CartCheckoutRequest checkoutRequest, Long userId) {
+//        System.out.println(checkoutRequest + "CHECK OUT REQUEST");
+//        User user = userRepository.getReferenceById(userId);
+//        User newUser = User.builder()
+//                .id(user.getId())
+//                .name(user.getName())
+//                .email(user.getEmail())
+//                .username(user.getUsername())
+//                .password(user.getPassword())
+//                .mobile(user.getMobile())
+//                .roles(user.getRoles())
+//                .accountBalance(user.getAccountBalance() - checkoutRequest.getPrice())
+//                .build();
+//        System.out.println(newUser);
+//        System.out.println(checkoutRequest.getCart() + "Cart Items!!");
+//        cartCheckoutRepository.save(checkoutRequest);
+//        return new ApiResponse(true, "Checked Out");
+//    }
+
+    public ApiResponse checkoutCart(CartCheckoutRequest checkoutRequest, Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        User newUser = new User(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPassword(), user.getMobile(), user.getVoucherBalance(), user.getRoles(), user.getAuthorities());
+
+        if (checkoutRequest.getTotal() > user.getAccountBalance()) {
+            throw new BadRequestException("Failed! Insufficient Balance.");
+        } else {
+            newUser.setAccountBalance(user.getAccountBalance() - checkoutRequest.getTotal());
+        }
+
+
+
+        CartCheckout cartCheckout = new CartCheckout();
+        cartCheckout.setOrderAddress(checkoutRequest.getOrderAddress());
+        cartCheckout.setPrice(checkoutRequest.getTotal());
+        cartCheckout.setQuantity(checkoutRequest.getQuantity());
+        cartCheckout.setUserId(userId);
+
+        // Create CartItem entities and populate the cart list
+        List<CartCheckout.CartItem> cartItems = checkoutRequest.getCart().stream()
+                .map(item -> {
+                    CartCheckout.CartItem cartItem = new CartCheckout.CartItem();
+                    cartItem.setProductName(item.getProductName());
+                    cartItem.setPrice(item.getPrice());
+                    cartItem.setQuantity(item.getQuantity());
+                    cartItem.setSubtotal(item.getSubtotal());
+                    return cartItem;
+                })
+                .collect(Collectors.toList());
+        cartCheckout.setCart(cartItems);
+
+        // Save the CartCheckout entity to the database
+        cartCheckoutRepository.save(cartCheckout);
+        userRepository.save(newUser);
+
+        return new ApiResponse(true, "Checked Out");
+    }
+
+    public List<CartCheckout> getCheckedOutCart(Long id) {
+        return cartCheckoutRepository.findByUserId(id);
     }
 }

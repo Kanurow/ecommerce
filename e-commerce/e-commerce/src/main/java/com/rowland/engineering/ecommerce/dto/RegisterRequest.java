@@ -14,6 +14,6 @@ public class RegisterRequest {
     private String mobile;
     private String promoCode;
     private String email;
-
+    private Double accountBalance;
     private String password;
 }

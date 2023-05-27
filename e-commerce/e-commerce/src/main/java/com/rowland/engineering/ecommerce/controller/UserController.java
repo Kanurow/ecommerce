@@ -1,9 +1,6 @@
 package com.rowland.engineering.ecommerce.controller;
 
-import com.rowland.engineering.ecommerce.dto.ApiResponse;
-import com.rowland.engineering.ecommerce.dto.RegisterRequest;
-import com.rowland.engineering.ecommerce.dto.UpdateUserRequest;
-import com.rowland.engineering.ecommerce.dto.UserSummary;
+import com.rowland.engineering.ecommerce.dto.*;
 import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.RoleName;
 import com.rowland.engineering.ecommerce.model.User;
@@ -82,7 +79,24 @@ public class UserController {
     )
     @GetMapping("/user/me")    //@PreAuthorize("hasRole('USER')")
     public UserSummary getCurrentUser(@CurrentUser User currentUser) {
-        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername());
+        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getEmail());
         return userSummary;
     }
+
+    @Operation(
+            description = "Deposit money into user account",
+            summary = "Enables money deposit that can be used for purchases"
+    )
+    @PutMapping("/deposit/{id}")
+    public ResponseEntity<?> makeDeposit(
+            @RequestBody DepositRequest depositRequest,
+            @PathVariable(value = "id") Long id){
+        userService.makeDeposit(depositRequest, id);
+        return new ResponseEntity<>(new ApiResponse(true, " "+ depositRequest.getDepositAmount() +" has been deposited into your account"), HttpStatus.ACCEPTED);
+    }
+
+
+
+
+
 }

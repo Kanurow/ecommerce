@@ -54,16 +54,12 @@ public class AuthController {
     )
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        System.out.println(loginRequest +" LOGIN REQUEST");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsernameOrEmail(),
                         loginRequest.getPassword()
                 )
         );
-
-        System.out.println(authentication +" LOGIN REQUEST auth -----");
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
@@ -86,8 +82,6 @@ public class AuthController {
             return new ResponseEntity<>(new ApiResponse(false, "Email Address already in use!"),
                     HttpStatus.BAD_REQUEST);
         }
-
-
         // Creating user's account
         User user = new User(registerRequest.getName(),  registerRequest.getUsername(),
                 registerRequest.getEmail(), registerRequest.getPassword(), registerRequest.getMobile());
@@ -108,11 +102,17 @@ public class AuthController {
             userRole = roleRepository.findByName(RoleName.ROLE_USER)
                     .orElseThrow(() -> new AppException("User Role not set."));
         }
+        Double openingAccountBalance;
+        if(registerRequest.getAccountBalance() == null || registerRequest.getAccountBalance() <= 0) {
+            openingAccountBalance = 0.0;
+        } else {
+            openingAccountBalance = registerRequest.getAccountBalance();
+        }
 
         user.setRoles(Collections.singleton(userRole));
-
+        user.setAccountBalance(openingAccountBalance);
         User savedUser = userRepository.save(user);
-        System.out.println(user);
+        System.out.println(savedUser + "SAVED USER");
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/users/{username}")
