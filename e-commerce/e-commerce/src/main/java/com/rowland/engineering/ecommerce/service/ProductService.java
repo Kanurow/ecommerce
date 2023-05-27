@@ -149,25 +149,7 @@ public ApiResponse unmark(Long id, User currentUser) throws Exception {
         return new ApiResponse(true, "Item removed from cart");
     }
 
-//
-//    public ApiResponse checkoutCart(CartCheckoutRequest checkoutRequest, Long userId) {
-//        System.out.println(checkoutRequest + "CHECK OUT REQUEST");
-//        User user = userRepository.getReferenceById(userId);
-//        User newUser = User.builder()
-//                .id(user.getId())
-//                .name(user.getName())
-//                .email(user.getEmail())
-//                .username(user.getUsername())
-//                .password(user.getPassword())
-//                .mobile(user.getMobile())
-//                .roles(user.getRoles())
-//                .accountBalance(user.getAccountBalance() - checkoutRequest.getPrice())
-//                .build();
-//        System.out.println(newUser);
-//        System.out.println(checkoutRequest.getCart() + "Cart Items!!");
-//        cartCheckoutRepository.save(checkoutRequest);
-//        return new ApiResponse(true, "Checked Out");
-//    }
+
 
     public ApiResponse checkoutCart(CartCheckoutRequest checkoutRequest, Long userId) {
         User user = userRepository.getReferenceById(userId);

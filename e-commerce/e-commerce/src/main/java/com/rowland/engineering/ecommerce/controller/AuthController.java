@@ -30,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Random;
 
 @CrossOrigin("http://localhost:3000")
 @RestController
@@ -71,7 +72,7 @@ public class AuthController {
             summary = "Enables user registration - To sign up with admin role, add `row` to email field."
     )
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody  RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody  RegisterRequest registerRequest) {
         System.out.println(registerRequest);
         if(userRepository.existsByUsername(registerRequest.getUsername())) {
             return new ResponseEntity<>(new ApiResponse(false, "Username is already taken!"),
@@ -91,6 +92,8 @@ public class AuthController {
             PromoCode code = promoCodeRepository.findByCodeIgnoreCase(registerRequest.getPromoCode());
             user.setVoucherBalance(code.getPromoAmount());
         }
+        String userAccountNumber = generateAccountNumber();
+        user.setAccountNumber(userAccountNumber);
 
         Role userRole;
 
@@ -121,6 +124,18 @@ public class AuthController {
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }
 
+    public static String generateAccountNumber() {
+        Random random = new Random();
+
+        // Generate a random integer with 10 digits
+        int randomNumber = random.nextInt(9000000) + 10000000;
+
+        // Concatenate with "00"
+        String generatedNumber = "00" + String.valueOf(randomNumber);
+        System.out.println(generatedNumber);
+
+        return generatedNumber;
+    }
 
 
 }

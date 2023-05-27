@@ -35,6 +35,7 @@ CREATE TABLE users_table (
     name VARCHAR(50) NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    account_number VARCHAR(10) UNIQUE NOT NULL,
     `password` VARCHAR(10000) NOT NULL ,
     mobile VARCHAR(100) ,
     authorities VARCHAR(50),
@@ -44,13 +45,6 @@ CREATE TABLE users_table (
     updated_at TIMESTAMP
 );
 
-
-
-
-
-
-
-
 CREATE TABLE promo_table (
     id INT PRIMARY KEY AUTO_INCREMENT,
     code VARCHAR(50),
@@ -58,18 +52,8 @@ CREATE TABLE promo_table (
 );
 
 
-
 INSERT INTO roles(name) VALUES('ROLE_USER');
 INSERT INTO roles(name) VALUES('ROLE_ADMIN');
-
-
-
-
-
-
-
-
-
 
 
 CREATE TABLE cart_checkout (

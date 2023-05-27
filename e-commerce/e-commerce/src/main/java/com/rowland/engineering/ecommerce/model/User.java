@@ -2,10 +2,16 @@ package com.rowland.engineering.ecommerce.model;
 
 import com.rowland.engineering.ecommerce.model.audit.DateAudit;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +31,9 @@ import java.util.stream.Collectors;
         }),
         @UniqueConstraint(columnNames = {
                 "email"
+        }),
+        @UniqueConstraint(columnNames = {
+                "account_number"
         })
 })
 public class User extends DateAudit implements UserDetails {
@@ -32,18 +41,36 @@ public class User extends DateAudit implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 40)
     private String name;
 
-
+    @NotBlank
+    @Size(max = 20)
     private String username;
 
+
+    @NotBlank
+    @Size(max = 15)
     private String mobile;
 
+    @NotBlank
+    @Size(max = 10)
+    @NaturalId
+    @Column(name = "account_number")
+    private String accountNumber;
+
+    @Email
+    @NaturalId
     private String email;
 
     private Double voucherBalance;
+
+
+    @NotNull
     private Double accountBalance;
 
+    @NotBlank
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;

@@ -53,6 +53,8 @@ public class UserController {
         return userService.findUserById(id);
     }
 
+
+
     @Operation(
             description = "Update user information",
             summary = "Updates user profile information"
@@ -95,6 +97,19 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponse(true, " "+ depositRequest.getDepositAmount() +" has been deposited into your account"), HttpStatus.ACCEPTED);
     }
 
+
+
+    @Operation(
+            description = "Transfer money into a different users account",
+            summary = "Enables money transfer into a different users account using email/account number"
+    )
+    @PutMapping("/transfer/{senderId}")
+    public ResponseEntity<?> transferToUser(
+            @RequestBody TransferRequest transferRequest,
+            @PathVariable(value = "senderId") Long senderId){
+        userService.makeTransfer(transferRequest, senderId);
+        return new ResponseEntity<>(new ApiResponse(true, " You have successfully transferred #"+ transferRequest.getTransferAmount() +" to " + transferRequest.getEmailOrAccountNumber()), HttpStatus.ACCEPTED);
+    }
 
 
 
