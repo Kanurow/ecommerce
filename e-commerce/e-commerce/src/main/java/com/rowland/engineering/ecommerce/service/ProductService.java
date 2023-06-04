@@ -2,6 +2,7 @@ package com.rowland.engineering.ecommerce.service;
 
 import com.rowland.engineering.ecommerce.dto.*;
 import com.rowland.engineering.ecommerce.exception.BadRequestException;
+import com.rowland.engineering.ecommerce.exception.InsufficientFundException;
 import com.rowland.engineering.ecommerce.exception.ResourceNotFoundException;
 import com.rowland.engineering.ecommerce.model.*;
 import com.rowland.engineering.ecommerce.repository.*;
@@ -153,10 +154,10 @@ public ApiResponse unmark(Long id, User currentUser) throws Exception {
 
     public ApiResponse checkoutCart(CartCheckoutRequest checkoutRequest, Long userId) {
         User user = userRepository.getReferenceById(userId);
-        User newUser = new User(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPassword(), user.getMobile(), user.getVoucherBalance(), user.getRoles(), user.getAuthorities());
+        User newUser = new User(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPassword(), user.getMobile(),user.getAccountNumber(), user.getVoucherBalance(), user.getRoles(), user.getAuthorities());
 
         if (checkoutRequest.getTotal() > user.getAccountBalance()) {
-            throw new BadRequestException("Failed! Insufficient Balance.");
+            throw new InsufficientFundException(checkoutRequest.getTotal() - user.getAccountBalance());
         } else {
             newUser.setAccountBalance(user.getAccountBalance() - checkoutRequest.getTotal());
         }

@@ -3,6 +3,7 @@ package com.rowland.engineering.ecommerce.controller;
 import com.rowland.engineering.ecommerce.dto.*;
 import com.rowland.engineering.ecommerce.model.Favourite;
 import com.rowland.engineering.ecommerce.model.RoleName;
+import com.rowland.engineering.ecommerce.model.Transaction;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import com.rowland.engineering.ecommerce.security.CurrentUser;
@@ -113,5 +114,16 @@ public class UserController {
 
 
 
+
+    @Operation(
+            description = "Gets users money transaction history",
+            summary = "View user transaction history ie Debits and Credits"
+    )
+    @GetMapping("/transactionhistory/{userId}")
+    public List<Transaction> viewMyTransactions(
+            @PathVariable(value = "userId") Long userId){
+        return userService.viewMyTransactions(userId);
+//        return new ResponseEntity<>(new ApiResponse(true, " You have successfully transferred #"+ transferRequest.getTransferAmount() +" to " + transferRequest.getEmailOrAccountNumber()), HttpStatus.ACCEPTED);
+    }
 
 }

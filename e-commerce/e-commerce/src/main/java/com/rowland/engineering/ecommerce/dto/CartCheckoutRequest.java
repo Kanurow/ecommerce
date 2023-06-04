@@ -16,9 +16,7 @@ public class CartCheckoutRequest {
     private Long userId;
     private List<CartItem> cart;
 
-    // Constructors, getters, and setters
 
-    // Inner class representing a cart item
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -28,7 +26,6 @@ public class CartCheckoutRequest {
         private int quantity;
         private double subtotal;
 
-        // Constructors, getters, and setters
     }
 }
 

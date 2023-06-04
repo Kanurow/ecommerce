@@ -198,7 +198,7 @@ public class ProductController {
             summary = "Retrieves all checked out goods"
     )
     @GetMapping("/checkedout/{id}")
-    public List<CartCheckout> getUserCartByUserId(@PathVariable(value = "id") Long id) {
+    public List<CartCheckout> getUserCartsByUserId(@PathVariable(value = "id") Long id) {
         return productService.getCheckedOutCart(id);
     }
 

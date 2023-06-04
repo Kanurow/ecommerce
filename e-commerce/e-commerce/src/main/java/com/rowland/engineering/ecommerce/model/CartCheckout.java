@@ -1,10 +1,14 @@
 package com.rowland.engineering.ecommerce.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Entity
 @Table(name = "cart_checkout")
@@ -26,8 +30,9 @@ public class CartCheckout {
     @JoinColumn(name = "cart_checkout_id")
     private List<CartItem> cart;
 
-    // Constructors, getters, and setters
 
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Data
     @Entity
     @Table(name = "cart_item")
@@ -45,6 +50,5 @@ public class CartCheckout {
 
         private double subtotal;
 
-        // Constructors, getters, and setters
     }
 }

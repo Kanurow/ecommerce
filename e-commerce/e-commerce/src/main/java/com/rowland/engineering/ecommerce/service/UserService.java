@@ -4,16 +4,22 @@ import com.rowland.engineering.ecommerce.dto.DepositRequest;
 import com.rowland.engineering.ecommerce.dto.TransferRequest;
 import com.rowland.engineering.ecommerce.dto.UpdateUserRequest;
 import com.rowland.engineering.ecommerce.exception.BadRequestException;
+import com.rowland.engineering.ecommerce.exception.InsufficientFundException;
+import com.rowland.engineering.ecommerce.exception.ReceiverNotFoundException;
 import com.rowland.engineering.ecommerce.model.Favourite;
 
+import com.rowland.engineering.ecommerce.model.Transaction;
+import com.rowland.engineering.ecommerce.model.TransactionType;
 import com.rowland.engineering.ecommerce.model.User;
 import com.rowland.engineering.ecommerce.repository.FavouriteRepository;
+import com.rowland.engineering.ecommerce.repository.TransactionRepository;
 import com.rowland.engineering.ecommerce.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +28,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
 
     private final FavouriteRepository favouriteRepository;
 
@@ -79,18 +86,19 @@ public class UserService {
 
     }
 
+
     @Transactional
     public void makeTransfer(TransferRequest transferRequest, Long senderId) {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UsernameNotFoundException("Sender user not found"));
 
         User receiver = userRepository.findByEmailOrAccountNumber(transferRequest.getEmailOrAccountNumber(), transferRequest.getEmailOrAccountNumber());
-        if (receiver.equals(null)) {
-            throw new UsernameNotFoundException("Receiver user not found");
+        if (receiver == null) {
+            throw new ReceiverNotFoundException("Receiver not found for the given email or account number: " + transferRequest.getEmailOrAccountNumber());
         }
 
         if (transferRequest.getTransferAmount() > sender.getAccountBalance()) {
-            throw new BadRequestException("Insufficient balance to complete transfer");
+            throw new InsufficientFundException(transferRequest.getTransferAmount() - sender.getAccountBalance());
         }
 
         double transferAmount = transferRequest.getTransferAmount();
@@ -101,27 +109,35 @@ public class UserService {
         double receiverBalance = receiver.getAccountBalance();
         receiver.setAccountBalance(receiverBalance + transferAmount);
 
+        Date timestamp = new Date();
+
+        // Create transaction entities for sender and receiver
+        Transaction senderTransaction = new Transaction();
+        senderTransaction.setSender(sender);
+        senderTransaction.setReceiver(receiver);
+        senderTransaction.setAmount(-transferAmount); // Negative value for debit transaction
+        senderTransaction.setTransactionType(TransactionType.DEBIT);
+        senderTransaction.setTransactionTime(timestamp);
+
+        Transaction receiverTransaction = new Transaction();
+        receiverTransaction.setSender(sender);
+        receiverTransaction.setReceiver(receiver);
+        receiverTransaction.setAmount(transferAmount); // Positive value for credit transaction
+        receiverTransaction.setTransactionType(TransactionType.CREDIT);
+        receiverTransaction.setTransactionTime(timestamp);
+
+        // Save the updated sender, receiver, and transactions
         userRepository.save(sender);
         userRepository.save(receiver);
+        transactionRepository.save(senderTransaction);
+        transactionRepository.save(receiverTransaction);
+    }
+
+    public List<Transaction> viewMyTransactions(Long userId) {
+        return transactionRepository.findAllBySenderId(userId);
     }
 
 
-//    @Transactional
-//    public void makeTransfer(TransferRequest transferRequest, Long senderId) {
-//        User userAccount = userRepository.getReferenceById(senderId);
-//        User senderInstance = new User(userAccount.getId(), userAccount.getUsername(), userAccount.getName(), userAccount.getEmail(), userAccount.getPassword(), userAccount.getMobile(), userAccount.getVoucherBalance(), userAccount.getRoles(), userAccount.getAuthorities());
-//
-//        User receiverAccount = userRepository.findByEmailOrAccountNumber(transferRequest.getEmailOrAccountNumber(), transferRequest.getEmailOrAccountNumber());
-//        User receiverInstance = new User(receiverAccount.getId(), receiverAccount.getUsername(), receiverAccount.getName(), receiverAccount.getEmail(), receiverAccount.getPassword(), receiverAccount.getMobile(), receiverAccount.getVoucherBalance(), receiverAccount.getRoles(), receiverAccount.getAuthorities());
-//
-//        if (transferRequest.getTransferAmount() > senderInstance.getAccountBalance() ) {
-//            throw new BadRequestException("Insufficient Balance to complete transfer!");
-//        }
-//        senderInstance.setAccountBalance(senderInstance.getAccountBalance() - transferRequest.getTransferAmount());
-//        receiverInstance.setAccountBalance(receiverAccount.getAccountBalance() + transferRequest.getTransferAmount());
-//
-//        userRepository.save(sender);
-//        userRepository.save(receiver);
-//
-//    }
+
+
 }

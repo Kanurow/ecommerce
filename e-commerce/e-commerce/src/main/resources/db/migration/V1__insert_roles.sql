@@ -30,6 +30,7 @@ CREATE TABLE product (
     price INT,
     quantity INT
 );
+
 CREATE TABLE users_table (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
@@ -44,6 +45,17 @@ CREATE TABLE users_table (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
+
+CREATE TABLE transaction_table (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sender_id BIGINT,
+    receiver_id BIGINT,
+    amount DOUBLE,
+    transaction_type VARCHAR(20),
+    transaction_time DATETIME
+
+);
+
 
 CREATE TABLE promo_table (
     id INT PRIMARY KEY AUTO_INCREMENT,
